@@ -48,6 +48,7 @@ export const content = {
   syncing: 'Syncing',
   maxImageCount: (count: number) => `Cannot exceed ${count} images`,
   maxByteLength: 'The total size of the picture exceeds the limit, please try to compress the picture, or reduce the number of pictures',
+  maxQuoteLength: 'The length of quoted text exceeds the limit, please try with less text',
   update: 'Update',
   image: 'Image',
   copied: 'Copied',

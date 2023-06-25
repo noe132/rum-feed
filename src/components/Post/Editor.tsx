@@ -13,6 +13,7 @@ import { IImage } from 'apis/image';
 import { v4 as uuid } from 'uuid';
 import sleep from 'utils/sleep';
 import { API_ORIGIN } from 'apis/common';
+import { pick } from 'lodash';
 
 export default observer((props: {
   groupId: string
@@ -52,6 +53,16 @@ export default observer((props: {
     };
     if (retweet) {
       post.extra.retweet = retweet;
+    }
+    if ((activity.object as any)?.quote) {
+      const quote = (activity.object as any).quote;
+      post.quote = pick(quote, [
+        'content',
+        'book',
+        'author',
+        'name',
+        'url',
+      ]);
     }
     if (activity.object?.attachment) {
       const video = (activity.object?.attachment as any)[0];
@@ -132,6 +143,14 @@ export default observer((props: {
             height: data.video.height,
           }];
           await submitVideo(data.video);
+        }
+        if (data.quote) {
+          (payload.object! as any).quote = {
+            type: 'Quote',
+            content: data.quote.content,
+            ...data.quote.name ? { name: data.quote.name } : {},
+            ...data.quote.url ? { url: data.quote.url } : {},
+          }
         }
         return submitPost(payload, data.retweet);
       }}

@@ -265,8 +265,14 @@ export default observer((props: RouteChildrenProps) => {
                               mediaType: v.mediaType,
                               content: v.content,
                             }))
-                          } : {}
-                        }
+                          } : {},
+                          ...data.quote ? {
+                            type: 'Quote',
+                            content: data.quote.content,
+                            ...data.quote.name ? { name: data.quote.name } : {},
+                            ...data.quote.url ? { url: data.quote.url } : {},
+                          } : {},
+                        },
                       };
                       return submitPost(payload);
                     }}

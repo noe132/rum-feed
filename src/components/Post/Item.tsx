@@ -399,7 +399,25 @@ export default observer((props: IProps) => {
                       {post.quote.content}
                     </div>
                     <div className="text-13 mt-3 opacity-70 dark:opacity-50 pr-10 flex">
-                      <div className="mr-1">/</div>{post.quote.author}《{post.quote.book}》
+                      <div className="mr-1">/</div>
+                      {!!post.quote.book && (<span>
+                        {post.quote.author}《{post.quote.book}》
+                      </span>)}
+                      {!post.quote.book && (!!post.quote.url || !!post.quote.name) && (<>
+                        {!!post.quote.url && (
+                          <a
+                            className="hover:underline"
+                            href={post.quote.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {post.quote.name || post.quote.url}
+                          </a>
+                        )}
+                        {!post.quote.url && (
+                          <span>{post.quote.name}</span>
+                        )}
+                      </>)}
                     </div>
                   </div>
                   <RiDoubleQuotesL className="text-20 md:text-24 opacity-40 dark:opacity-30 absolute top-[6px] md:top-[10px] left-[10px]" />

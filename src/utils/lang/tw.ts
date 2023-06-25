@@ -48,6 +48,7 @@ export const content = {
   syncing: '同步中',
   maxImageCount: (count: number) => `最多添加 ${count} 張圖片`,
   maxByteLength: '圖片的總體積超過限制，請嘗試壓縮圖片，或減少圖片數量',
+  maxQuoteLength: '引用的文字長度超過限製，請嘗試縮短引用的文字',
   update: '更新',
   image: '圖片',
   copied: '已複製',

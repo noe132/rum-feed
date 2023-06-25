@@ -82,11 +82,13 @@ const pack = async item => {
       post.video = video;
     }
   }
-  if (quote && quote.content && quote.book && quote.author) {
+  if (quote && quote.content) {
     post.quote = pick(quote, [
       'content',
       'book',
       'author',
+      'name',
+      'url',
     ]);
   }
   return post

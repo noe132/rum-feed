@@ -38,4 +38,6 @@ interface IQuote {
   content: string
   book: string
   author: string
+  name?: string
+  url?: string
 }

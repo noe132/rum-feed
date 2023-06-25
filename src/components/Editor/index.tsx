@@ -15,6 +15,8 @@ import UploadDropZone from '@rpldy/upload-drop-zone';
 import withPasteUpload from '@rpldy/upload-paste';
 import UploadPreview, { PreviewItem } from '@rpldy/upload-preview';
 import { IoMdClose } from 'react-icons/io';
+import { RiDoubleQuotesL, RiDoubleQuotesR } from 'react-icons/ri';
+import { AiFillCloseCircle } from 'react-icons/ai';
 import Button from 'components/Button';
 import Loading from 'components/Loading';
 import Avatar from 'components/Avatar';
@@ -53,6 +55,11 @@ type ISubmitData = {
   images?: IImage[]
   retweet?: IPost
   video?: IUploadVideoRes
+  quote?: {
+    content: string
+    name?: string
+    url?: string
+  }
 };
 
 interface IProps {
@@ -160,6 +167,11 @@ const Editor = observer((props: IProps) => {
     retweetUrl: '',
     retweet: props.retweet || null as IPost | null,
     lastUrl: '',
+    quote: null as null | {
+      content: string
+      name: string
+      url: string
+    },
     enabledDraftListener: false,
     video: null as null | IUploadVideoRes
   }));
@@ -235,6 +247,32 @@ const Editor = observer((props: IProps) => {
     return () => {
       getSocket().off('videoUploadProgress', listener);
     }
+  }, []);
+
+  React.useEffect(() => {
+    interface Quote {
+      content: string
+      name?: string
+      url?: string
+    }
+    const onQuote = (quote: Quote) => {
+      try {
+        if (quote.content.length > 2000) {
+          snackbarStore.show({
+            message: lang.maxQuoteLength,
+            type: 'error',
+          })
+          return
+        }
+        state.quote = {
+          content: quote.content,
+          name: quote.name ?? '',
+          url: quote.url ?? '',
+        };
+      } catch (e) {}
+    };
+
+    (window.document as any).editorSetQuote = onQuote;
   }, []);
 
   const saveDraft = React.useCallback(
@@ -337,10 +375,18 @@ const Editor = observer((props: IProps) => {
     if (state.video) {
       payload.video = state.video;
     }
+    if (state.quote) {
+      payload.quote = {
+        content: state.quote.content,
+        name: state.quote.name,
+        url: state.quote.url,
+      };
+    }
     let _draft = localStorage.getItem(draftKey) || '';
     localStorage.removeItem(draftKey);
     try {
       await props.submit(payload);
+      state.quote = null;
       state.content = '';
       if (props.enabledImage) {
         for (const prop of Object.keys(state.imageMap)) {
@@ -434,6 +480,40 @@ const Editor = observer((props: IProps) => {
 
   return (
     <div className="w-full">
+      {!!state.quote && !!state.quote.content && (
+        <div className="relative rounded-12 pt-[26px] pb-4 pl-5 pr-3 md:pt-6 md:pb-4 md:pl-10 md:pr-6 mb-3 !outline !outline-1 !outline-gray-400 text-gray-4a/80 dark:text-white/60">
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden bg-cover dark:bg-[left_33px] rounded-12 bg-slate-500/10">
+            <div className="absolute inset-0 rounded-12" />
+          </div>
+          <div
+            className="absolute p-2 top-0 right-0 text-gray-400/40 hover:text-red-500/60 z-20 rounded-full"
+            onClick={() => { state.quote = null; }}
+          >
+            <AiFillCloseCircle className="text-20 md:text-20" />
+          </div>
+          <div className="relative z-10">
+            <div className="tracking-wider leading-[1.75]">
+              {state.quote.content}
+            </div>
+            <div className="text-13 mt-3 opacity-70 dark:opacity-50 pr-10 flex">
+              <div className="mr-1"> / </div>
+              {!!state.quote.url && (
+                <a
+                  className="hover:underline"
+                  href={state.quote.url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {state.quote.name || state.quote.url}
+                </a>
+              )}
+              {!state.quote.url && state.quote.name}
+            </div>
+          </div>
+          <RiDoubleQuotesL className="text-20 md:text-24 opacity-40 dark:opacity-30 absolute top-[6px] md:top-[10px] left-[10px]" />
+          <RiDoubleQuotesR className="text-20 md:text-24 opacity-40 dark:opacity-30 absolute bottom-[14px] md:bottom-[14px] right-[10px]" />
+        </div>
+      )}
       <div className="flex items-start">
         {props.enabledProfile && (
           <Avatar
